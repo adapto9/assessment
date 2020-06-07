@@ -54,6 +54,27 @@ def upload():
                         rejected = True
                         rejectedReason = row
                         break
+            
+            # If no data extracted from file, reject
+            if len(data) == 0 and rejectedReason == '':
+                rejected = True
+                rejectedReason = 'Empty file'
+
+            # Check if any login change that belongs to another user
+            currLoginList = db.getAllEmployeeLogins()
+            for row in data:
+                for login in currLoginList:
+                    if row[1] == login[1] and row[0] != login[0]:
+                        rejected = True
+                        rejectedReason = row
+                        break
+            
+            # If data okay, insert or replace employees
+            if not rejected:
+                if db.insertEmployees(data):
+                    return Response('Upload succeeded', status=200, mimetype='application/json')
+                else:
+                    return Response('Upload failed', status=500, mimetype='application/json')
 
         return Response('Rejected: ' + str(rejectedReason), status=400, mimetype='application/json')
     except Exception as e:
