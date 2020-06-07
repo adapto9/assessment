@@ -41,14 +41,18 @@ def isValidParams(minSal, maxSal, offset, limit, sort):
     # If salary params invalid, reject
     if minSal < 0 or maxSal < 0 or maxSal < minSal:
         return False
+
+    # If limit or offset params invalid, reject
+    if offset < 0 or limit < 0:
+        return False
     
     # If sort sign not valid, reject
-    if sort[0] != '-' and sort[0] != ' ' and sort[0:3] != '%2B':
+    if sort[0] != '-' and sort[0] != ' ' and sort[0] != '+' and sort[:3] != '%2B':
         return False
     
     # if sort key not valid, reject
     keys = ['id', 'name', 'login', 'salary']
-    if sort[0:3] == '%2B':
+    if sort[:3] == '%2B':
         if sort[3:] not in keys:
             return False
     else:
@@ -61,7 +65,7 @@ def prepareParams(minSal, maxSal, offset, limit, sort):
     params = None
     sorting = ''
     # If sort sign is URI encoded +
-    if sort[0:3] == '%2B':
+    if sort[:3] == '%2B':
         params = (minSal, maxSal, limit, offset)
         sorting = sort[3:] + ' ASC'
     else:
@@ -69,7 +73,7 @@ def prepareParams(minSal, maxSal, offset, limit, sort):
         if sort[0] == '-':
             params = (minSal, maxSal, limit, offset)
             sorting = sort[1:] + ' DESC'
-        # If sort sign is + replaced with space
+        # If sort sign is + or replaced with space
         else:
             params = (minSal, maxSal, limit, offset)
             sorting = sort[1:] + ' ASC'
