@@ -1,4 +1,4 @@
-from flask import Flask, request, Response, jsonify
+from flask import Flask, request, jsonify
 from database import DatabaseUtil
 
 import csv
@@ -59,7 +59,7 @@ def isValidParams(minSal, maxSal, offset, limit, sort):
 
 def prepareParams(minSal, maxSal, offset, limit, sort):
     params = None
-    sorting = ""
+    sorting = ''
     # If sort sign is URI encoded +
     if sort[0:3] == '%2B':
         params = (minSal, maxSal, limit, offset)
@@ -88,7 +88,7 @@ def getUsers():
     sort = request.args.get('sort', type=str)
 
     if not isValidParams(minSal, maxSal, offset, limit, sort):
-        return Response('Param missing', status=400, mimetype='application/json')
+        return jsonify({ 'result': 'Missing parameter' }), 400
     else:
         try:
             params, sorting = prepareParams(minSal, maxSal, offset, limit, sort)
@@ -98,14 +98,14 @@ def getUsers():
         except Exception as e:
             print(e)
             db.close()
-            return Response('Rejected: Exception ocurred', status=500, mimetype='application/json')
+            return jsonify({ 'result': 'Exception ocurred' }), 500
 
 
 @app.route('/users/upload', methods = ['POST'])
 def upload():
     global inUse
     if inUse:
-        return Response('Rejected: Another file is currently being uploaded', status=503, mimetype='application/json')
+        return jsonify({ 'result': 'Rejected as another file is currently being uploaded' }), 503
     try:
         inUse = True
         # Init
@@ -150,14 +150,14 @@ def upload():
             # If data okay, insert or replace employees
             if not rejected:
                 if db.insertEmployees(data):
-                    return Response('Upload succeeded', status=200, mimetype='application/json')
+                    return jsonify({ 'result': 'Upload succeeded' }), 200
                 else:
-                    return Response('Upload failed', status=500, mimetype='application/json')
+                    return jsonify({ 'result': 'Upload failed' }), 500
 
-        return Response('Rejected: ' + str(rejectedReason), status=400, mimetype='application/json')
+        return jsonify({ 'result': 'Rejected due to: ' + str(rejectedReason) }), 400
     except Exception as e:
         print(e)
-        return Response('Rejected: Exception ocurred', status=500, mimetype='application/json')
+        return jsonify({ 'result': 'Exception ocurred' }), 500
     finally:
         db.close()
         inUse = False
