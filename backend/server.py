@@ -1,4 +1,5 @@
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 from database import DatabaseUtil
 
 import csv
@@ -8,6 +9,7 @@ import codecs
 # Globals
 
 app = Flask(__name__)
+CORS(app)
 inUse = False
 
 ######################################################
