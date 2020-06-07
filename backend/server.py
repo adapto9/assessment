@@ -1,11 +1,17 @@
-from flask import Flask, request, Response
+from flask import Flask, request, Response, jsonify
 from database import DatabaseUtil
 
 import csv
 import codecs
 
+######################################################
+# Globals
+
 app = Flask(__name__)
 inUse = False
+
+######################################################
+# Helper functions
 
 def isValidRow(row):
     # If not 4 columns, reject
@@ -22,6 +28,78 @@ def isValidRow(row):
         return False
 
     return True
+
+def isNone(val):
+    if val == None: return True
+    return False
+
+def isValidParams(minSal, maxSal, offset, limit, sort):
+    # If param empty, reject
+    if isNone(minSal) or isNone(maxSal) or isNone(offset) or isNone(limit) or isNone(sort) or sort == '':
+        return False
+    
+    # If salary params invalid, reject
+    if minSal < 0 or maxSal < 0 or maxSal < minSal:
+        return False
+    
+    # If sort sign not valid, reject
+    if sort[0] != '-' and sort[0] != ' ' and sort[0:3] != '%2B':
+        return False
+    
+    # if sort key not valid, reject
+    keys = ['id', 'name', 'login', 'salary']
+    if sort[0:3] == '%2B':
+        if sort[3:] not in keys:
+            return False
+    else:
+        if sort[1:] not in keys:
+            return False
+
+    return True
+
+def prepareParams(minSal, maxSal, offset, limit, sort):
+    params = None
+    sorting = ""
+    # If sort sign is URI encoded +
+    if sort[0:3] == '%2B':
+        params = (minSal, maxSal, limit, offset)
+        sorting = sort[3:] + ' ASC'
+    else:
+        # If sort sign is -
+        if sort[0] == '-':
+            params = (minSal, maxSal, limit, offset)
+            sorting = sort[1:] + ' DESC'
+        # If sort sign is + replaced with space
+        else:
+            params = (minSal, maxSal, limit, offset)
+            sorting = sort[1:] + ' ASC'
+    return params, sorting
+
+######################################################
+# Routes
+
+@app.route('/users', methods = ['GET'])
+def getUsers():
+    # Validation for request params
+    minSal = request.args.get('minSalary', type=float)
+    maxSal = request.args.get('maxSalary', type=float)
+    offset = request.args.get('offset', type=int)
+    limit = request.args.get('limit', type=int)
+    sort = request.args.get('sort', type=str)
+
+    if not isValidParams(minSal, maxSal, offset, limit, sort):
+        return Response('Param missing', status=400, mimetype='application/json')
+    else:
+        try:
+            params, sorting = prepareParams(minSal, maxSal, offset, limit, sort)
+            db = DatabaseUtil()
+            res = { 'result': db.getEmployeeDashboard(params, sorting) }
+            return jsonify(res), 200
+        except Exception as e:
+            print(e)
+            db.close()
+            return Response('Rejected: Exception ocurred', status=500, mimetype='application/json')
+
 
 @app.route('/users/upload', methods = ['POST'])
 def upload():
@@ -81,7 +159,11 @@ def upload():
         print(e)
         return Response('Rejected: Exception ocurred', status=500, mimetype='application/json')
     finally:
+        db.close()
         inUse = False
+
+######################################################
+# Run server
 
 if __name__ == '__main__':
     app.run()

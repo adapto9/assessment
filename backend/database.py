@@ -20,9 +20,10 @@ class DatabaseUtil:
             salary REAL NOT NULL
             );''')
 
-    def getAllEmployees(self):
+    def getEmployeeDashboard(self, params, sorting):
+        # Can't seem to parameterize the column name and ASC DESC correctly, resorting to this in the meantime
         self.cur.execute('''
-        SELECT * FROM employee;''')
+        SELECT * FROM employee WHERE salary >= ? AND salary <= ? ORDER BY ''' + sorting + ''' LIMIT ? OFFSET ?;''', params)
         return self.cur.fetchall()
     
     def getAllEmployeeLogins(self):
