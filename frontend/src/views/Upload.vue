@@ -1,17 +1,14 @@
 <template>
-  <div class="upload">
-    <div class="container">
-      <div class="large-12 medium-12 small-12 cell">
-        <h1>Upload Employees CSV</h1>
-        <label>
-          File
-          <input type="file" id="file" ref="file" v-on:change="handleFileUpload()" />
-        </label>
-        <button v-on:click="submitFile()">Submit</button>
-        <div class="response">{{ response }}</div>
-      </div>
-    </div>
-  </div>
+  <v-container>
+    <v-row class="text-center">
+      <v-col cols="12">
+        <h1>Upload CSV</h1>
+        <v-file-input accept=".csv" label="File input" v-model="file"></v-file-input>
+        <v-btn block color="primary" v-on:click="submitFile()" :loading="loading">Submit</v-btn>
+        <blockquote class="blockquote">{{ response }}</blockquote>
+      </v-col>
+    </v-row>
+  </v-container>
 </template>
 
 <script>
@@ -20,33 +17,39 @@ import axios from "axios";
 export default {
   data() {
     return {
-      file: "",
+      file: null,
+      loading: false,
       response: ""
     };
   },
 
   methods: {
     submitFile() {
-      let formData = new FormData();
-      formData.append("file", this.file);
-      axios
-        .post("http://127.0.0.1:5000/users/upload", formData, {
-          headers: {
-            "Content-Type": "multipart/form-data"
-          }
-        })
-        .then(response => {
-          this.response = response;
-          this.file = "";
-        })
-        .catch(response => {
-          this.response = response;
-          this.file = "";
-        });
-    },
-
-    handleFileUpload() {
-      this.file = this.$refs.file.files[0];
+      if (this.file != null) {
+        this.loading = true;
+        let formData = new FormData();
+        formData.append("file", this.file);
+        axios
+          .post("http://127.0.0.1:5000/users/upload", formData, {
+            headers: {
+              "Content-Type": "multipart/form-data"
+            }
+          })
+          .then(response => {
+            this.response = response.data.result;
+            this.file = null;
+            this.loading = false
+          })
+          .catch(error => {
+            this.response =
+              "Error code " +
+              error.response.status +
+              ": " +
+              error.response.data.result;
+            this.file = null;
+            this.loading = false
+          });
+      }
     }
   }
 };
