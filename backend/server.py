@@ -99,8 +99,10 @@ def getUsers():
         try:
             params, sorting = prepareParams(minSal, maxSal, offset, limit, sort)
             db = DatabaseUtil()
-            res = { 'result': db.getEmployeeDashboard(params, sorting) }
-            return jsonify(res), 200
+            res = db.getEmployeeDashboard(params, sorting)
+            for i in range(len(res)):
+                res[i] = { 'id': res[i][0], 'login': res[i][1], 'name': res[i][2], 'salary': res[i][3] }
+            return jsonify({ 'result': res }), 200
         except Exception as e:
             print(e)
             db.close()
