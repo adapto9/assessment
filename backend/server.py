@@ -45,7 +45,7 @@ def isValidParams(minSal, maxSal, offset, limit, sort):
         return False
 
     # If limit or offset params invalid, reject
-    if offset < 0 or limit < 0:
+    if offset < 0 or limit < 0 or limit > 30:
         return False
     
     # If sort sign not valid, reject
