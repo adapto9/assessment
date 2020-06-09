@@ -94,7 +94,7 @@ def getUsers():
     sort = request.args.get('sort', type=str)
 
     if not isValidParams(minSal, maxSal, offset, limit, sort):
-        return jsonify({ 'result': 'Missing parameter' }), 400
+        return jsonify({ 'results': 'Missing parameter' }), 400
     else:
         try:
             params, sorting = prepareParams(minSal, maxSal, offset, limit, sort)
@@ -102,18 +102,18 @@ def getUsers():
             res = db.getEmployeeDashboard(params, sorting)
             for i in range(len(res)):
                 res[i] = { 'id': res[i][0], 'login': res[i][1], 'name': res[i][2], 'salary': res[i][3] }
-            return jsonify({ 'result': res }), 200
+            return jsonify({ 'results': res }), 200
         except Exception as e:
             print(e)
             db.close()
-            return jsonify({ 'result': 'Exception ocurred' }), 500
+            return jsonify({ 'results': 'Exception ocurred' }), 500
 
 
 @app.route('/users/upload', methods = ['POST'])
 def upload():
     global inUse
     if inUse:
-        return jsonify({ 'result': 'Rejected as another file is currently being uploaded' }), 503
+        return jsonify({ 'results': 'Rejected as another file is currently being uploaded' }), 503
     try:
         inUse = True
         # Init
@@ -158,14 +158,14 @@ def upload():
             # If data okay, insert or replace employees
             if not rejected:
                 if db.insertEmployees(data):
-                    return jsonify({ 'result': 'Upload succeeded' }), 200
+                    return jsonify({ 'results': 'Upload succeeded' }), 200
                 else:
-                    return jsonify({ 'result': 'Upload failed' }), 500
+                    return jsonify({ 'results': 'Upload failed' }), 500
 
-        return jsonify({ 'result': 'Rejected due to: ' + str(rejectedReason) }), 400
+        return jsonify({ 'results': 'Rejected due to: ' + str(rejectedReason) }), 400
     except Exception as e:
         print(e)
-        return jsonify({ 'result': 'Exception ocurred' }), 500
+        return jsonify({ 'results': 'Exception ocurred' }), 500
     finally:
         db.close()
         inUse = False

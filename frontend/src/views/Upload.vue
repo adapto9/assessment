@@ -36,7 +36,7 @@ export default {
             }
           })
           .then(response => {
-            this.response = response.data.result;
+            this.response = response.data.results;
             this.file = null;
             this.loading = false
           })
@@ -45,7 +45,7 @@ export default {
               "Error code " +
               error.response.status +
               ": " +
-              error.response.data.result;
+              error.response.data.results;
             this.file = null;
             this.loading = false
           });
