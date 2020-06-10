@@ -1,7 +1,7 @@
 import sqlite3
 
 class DatabaseUtil:
-    DB_LOCATION = 'backend/database.db'
+    DB_LOCATION = 'database.db'
 
     def __init__(self):
         # Init Attributes

@@ -90,31 +90,36 @@ def prepareParams(minSal, maxSal, offset, limit, sort):
 # Routes
 
 @app.route('/users', methods = ['GET'])
-def getUsers():
-    # Validation for request params
-    minSal = request.args.get('minSalary', type=float)
-    maxSal = request.args.get('maxSalary', type=float)
-    offset = request.args.get('offset', type=int)
-    limit = request.args.get('limit', type=int)
-    sort = request.args.get('sort', type=str)
-
-    if not isValidParams(minSal, maxSal, offset, limit, sort):
-        return jsonify({ 'results': 'Invalid parameters' }), 400
-    else:
-        try:
+def getUsers(): 
+    try:
+        # Init
+        db = DatabaseUtil()
+        
+        # Validation for request params
+        minSal = request.args.get('minSalary', type=float)
+        maxSal = request.args.get('maxSalary', type=float)
+        offset = request.args.get('offset', type=int)
+        limit = request.args.get('limit', type=int)
+        sort = request.args.get('sort', type=str)
+        if not isValidParams(minSal, maxSal, offset, limit, sort):
+            return jsonify({ 'results': 'Invalid parameters' }), 400
+        else:
+            # Prepare params
             params, sorting = prepareParams(minSal, maxSal, offset, limit, sort)
-
-            db = DatabaseUtil()
+            
+            # Query DB to get employees
             count = db.getEmployeeDashboardCount(params, sorting)
             res = db.getEmployeeDashboard(params, sorting)
+            
+            # Format the json response
             for i in range(len(res)):
                 res[i] = { 'id': res[i][0], 'login': res[i][1], 'name': res[i][2], 'salary': res[i][3] }
             return jsonify({ 'results': res, 'count': count }), 200
-        except Exception as e:
-            print(e)
-            return jsonify({ 'results': 'Exception ocurred' }), 500
-        finally:
-            db.close()
+    except Exception as e:
+        print(e)
+        return jsonify({ 'results': 'Exception ocurred' }), 500
+    finally:
+        db.close()
 
 
 @app.route('/users/upload', methods = ['POST'])
@@ -123,7 +128,6 @@ def upload():
     if inUse:
         return jsonify({ 'results': 'Rejected as another file is currently being uploaded' }), 503
     try:
-        
         # Init
         db = DatabaseUtil()
         inUse = True
