@@ -69,7 +69,7 @@ export default {
     minSalary: 0,
     maxSalary: 5000,
     offset: 0,
-    limit: 30,
+    limit: 5,
     sortColumn: "Id",
     sortOrder: "Ascending",
     employees: [],
@@ -109,10 +109,11 @@ export default {
         .then(response => {
           this.loading = false;
           if (newPage == false) {
-            if (response.data.count % this.limit != 0) {
-              this.pageCount = Math.floor(response.data.count / this.limit) + 1;
+            if (response.data.count[0][0] % this.limit != 0) {
+              console.log(response.data.count[0][0])
+              this.pageCount = Math.floor(response.data.count[0][0] / this.limit) + 1;
             } else {
-              this.pageCount = Math.floor(response.data.count / this.limit);
+              this.pageCount = Math.floor(response.data.count[0][0] / this.limit);
             }
           }
 
