@@ -31,6 +31,11 @@ def isValidRow(row):
 
     return True
 
+def isDuplicated(column):
+    # Check if column contains any duplicates
+    if len(column) == len(set(column)): return False
+    return True
+
 def isNone(val):
     if val == None: return True
     return False
@@ -131,7 +136,13 @@ def upload():
         if not rejected:
             data = []
             stream = codecs.iterdecode(uploaded.stream, 'utf-8')
+            header = True
             for row in csv.reader(stream, dialect=csv.excel):
+                # To skip header
+                if header:
+                    header = False
+                    continue
+
                 # If row is not a comment check if valid
                 if row[0][0] != '#':
                     if isValidRow(row):
@@ -146,14 +157,26 @@ def upload():
                 rejected = True
                 rejectedReason = 'Empty file'
 
+            # Check if id or login appears twice
+            if not rejected:
+                columns = [[], []]
+                for row in data:
+                    columns[0].append(row[0])
+                    columns[1].append(row[1])
+                if isDuplicated(columns[0]) or isDuplicated(columns[1]):
+                    rejected = True
+                    rejectedReason = 'Duplicate Id/Login'
+            columns = []
+
             # Check if any login change that belongs to another user
-            currLoginList = db.getAllEmployeeLogins()
-            for row in data:
-                for login in currLoginList:
-                    if row[1] == login[1] and row[0] != login[0]:
-                        rejected = True
-                        rejectedReason = row
-                        break
+            if not rejected:
+                currLoginList = db.getAllEmployeeLogins()
+                for row in data:
+                    for login in currLoginList:
+                        if row[1] == login[1] and row[0] != login[0]:
+                            rejected = True
+                            rejectedReason = row
+                            break
             
             # If data okay, insert or replace employees
             if not rejected:

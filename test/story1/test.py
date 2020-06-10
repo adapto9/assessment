@@ -15,6 +15,8 @@ def testSuite():
     testCsvUpload('test/story1/emptyTest.csv', 400, '{"results":"Rejected due to: Empty file"}')
     testCsvUpload('test/story1/loginTest.csv', 400, '{"results":"Rejected due to: [\'e0002\', \'hpotter\', \'Ron Weasley\', \'19234.50\']"}')
     testCsvUpload('test/story1/salaryTest.csv', 400, '{"results":"Rejected due to: [\'e0003\', \'ssnape\', \'Severus Snape\', \'4000..0\']"}')
+    testCsvUpload('test/story1/duplicatedIdTest.csv', 400, '{"results":"Rejected due to: Duplicate Id/Login"}')
+    testCsvUpload('test/story1/duplicatedLoginTest.csv', 400, '{"results":"Rejected due to: Duplicate Id/Login"}')
     testCsvUpload('test/story1/test.csv', 200, '{"results":"Upload succeeded"}')
     print('Test cases ran successfully!')
 
