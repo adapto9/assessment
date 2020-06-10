@@ -105,10 +105,11 @@ def getUsers():
             params, sorting = prepareParams(minSal, maxSal, offset, limit, sort)
 
             db = DatabaseUtil()
+            count = db.getEmployeeDashboardCount(params, sorting)
             res = db.getEmployeeDashboard(params, sorting)
             for i in range(len(res)):
                 res[i] = { 'id': res[i][0], 'login': res[i][1], 'name': res[i][2], 'salary': res[i][3] }
-            return jsonify({ 'results': res }), 200
+            return jsonify({ 'results': res, 'count': count }), 200
         except Exception as e:
             print(e)
             return jsonify({ 'results': 'Exception ocurred' }), 500

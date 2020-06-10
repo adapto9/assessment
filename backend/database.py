@@ -20,6 +20,12 @@ class DatabaseUtil:
             salary REAL NOT NULL
             );''')
 
+    def getEmployeeDashboardCount(self, params, sorting):
+        # Can't seem to parameterize the column name and ASC DESC correctly, resorting to this in the meantime
+        self.cur.execute('''
+        SELECT COUNT(1) FROM employee WHERE salary >= ? AND salary <= ? ORDER BY ''' + sorting + ''' LIMIT ? OFFSET ?;''', params)
+        return self.cur.fetchall()
+
     def getEmployeeDashboard(self, params, sorting):
         # Can't seem to parameterize the column name and ASC DESC correctly, resorting to this in the meantime
         self.cur.execute('''
