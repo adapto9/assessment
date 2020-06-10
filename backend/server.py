@@ -103,6 +103,7 @@ def getUsers():
     else:
         try:
             params, sorting = prepareParams(minSal, maxSal, offset, limit, sort)
+
             db = DatabaseUtil()
             res = db.getEmployeeDashboard(params, sorting)
             for i in range(len(res)):
@@ -110,8 +111,9 @@ def getUsers():
             return jsonify({ 'results': res }), 200
         except Exception as e:
             print(e)
-            db.close()
             return jsonify({ 'results': 'Exception ocurred' }), 500
+        finally:
+            db.close()
 
 
 @app.route('/users/upload', methods = ['POST'])
@@ -120,9 +122,10 @@ def upload():
     if inUse:
         return jsonify({ 'results': 'Rejected as another file is currently being uploaded' }), 503
     try:
-        inUse = True
+        
         # Init
         db = DatabaseUtil()
+        inUse = True
         rejected = False
         rejectedReason = ''
 
