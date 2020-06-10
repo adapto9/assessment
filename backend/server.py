@@ -99,7 +99,7 @@ def getUsers():
     sort = request.args.get('sort', type=str)
 
     if not isValidParams(minSal, maxSal, offset, limit, sort):
-        return jsonify({ 'results': 'Missing parameter' }), 400
+        return jsonify({ 'results': 'Invalid parameters' }), 400
     else:
         try:
             params, sorting = prepareParams(minSal, maxSal, offset, limit, sort)
