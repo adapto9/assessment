@@ -1,6 +1,4 @@
 .DS_Store
-frontend/node_modules
-frontend/dist
 
 # local env files
 frontend/.env.local
@@ -26,3 +24,12 @@ frontend/pnpm-debug.log*
 
 # Database
 *.db
+
+# Generated dists
+backend/build
+backend/dist
+backend/server.spec
+frontend/dist
+
+# Node modules
+frontend/node_modules

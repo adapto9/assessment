@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS
 from database import DatabaseUtil
 
@@ -8,7 +8,7 @@ import codecs
 ######################################################
 # Globals
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='static')
 CORS(app)
 inUse = False
 
@@ -89,8 +89,12 @@ def prepareParams(minSal, maxSal, offset, limit, sort):
 ######################################################
 # Routes
 
+@app.route('/')
+def index():
+    return render_template('index.html')
+
 @app.route('/users', methods = ['GET'])
-def getUsers(): 
+def getUsers():
     try:
         # Init
         db = DatabaseUtil()

@@ -69,7 +69,7 @@ export default {
     minSalary: 0,
     maxSalary: 5000,
     offset: 0,
-    limit: 5,
+    limit: 30,
     sortColumn: "Id",
     sortOrder: "Ascending",
     employees: [],
