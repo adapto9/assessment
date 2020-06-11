@@ -8,6 +8,7 @@ def testGetEmployees(minSalary, maxSalary, offset, limit, sort, code):
     assert res.status_code == code
 
 def testSuite():
+    # Test sorting
     testGetEmployees(0.0, 5000.0, 0, 30, '+id', 200)
     testGetEmployees(0.0, 5000.0, 0, 30, '-id', 200)
     testGetEmployees(0.0, 5000.0, 0, 30, '+login', 200)
@@ -17,16 +18,11 @@ def testSuite():
     testGetEmployees(0.0, 5000.0, 0, 30, '+salary', 200)
     testGetEmployees(0.0, 5000.0, 0, 30, '-salary', 200)
 
+    # Test negative values
     testGetEmployees(0.0, 5000.0, 30, 30, '+id', 200)
     testGetEmployees(0.0, 5000.0, 30, -30, '+id', 400)
     testGetEmployees(0.0, 5000.0, -30, 30, '+id', 400)
     testGetEmployees(0.0, 5000.0, -30, -30, '+id', 400)
-
-    testGetEmployees(10.0, 5000.0, 0, 30, '+id', 200)
-    testGetEmployees(10.0, 5000, 0, 30, '+id', 200)
-    testGetEmployees(10, 5000.0, 0, 30, '+id', 200)
-    testGetEmployees(10, 5000, 0, 30, '+id', 200)
-
     testGetEmployees(0.0, -5000.0, 0, 30, '+id', 400)
     testGetEmployees(-0.0, 5000.0, 0, 30, '+id', 200)
     testGetEmployees(-10.0, 5000.0, 0, 30, '+id', 400)
@@ -34,6 +30,13 @@ def testSuite():
     testGetEmployees(-10.0, -5000.0, 30, 30, '+id', 400)
     testGetEmployees(0.0, 0.0, 0, 30, '+id', 200)
 
+    # Test decimal points
+    testGetEmployees(10.0, 5000.0, 0, 30, '+id', 200)
+    testGetEmployees(10.0, 5000, 0, 30, '+id', 200)
+    testGetEmployees(10, 5000.0, 0, 30, '+id', 200)
+    testGetEmployees(10, 5000, 0, 30, '+id', 200)
+
+    # Test validation
     testGetEmployees(0.0, 5000.0, 0, 30, 'id', 400)
     testGetEmployees(0.0, 5000.0, 0, 30, '', 400)
     testGetEmployees(0.0, '5000.0', 0, 30, '+id', 200)

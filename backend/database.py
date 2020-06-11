@@ -6,6 +6,7 @@ class DatabaseUtil:
     def __init__(self):
         # Init Attributes
         self.conn = sqlite3.connect(DatabaseUtil.DB_LOCATION)
+        # Set returned results to be in list instead of tuple
         self.conn.row_factory = lambda cursor, row: list(row)
         self.cur = self.conn.cursor()
         self.createTable()
