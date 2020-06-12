@@ -35,6 +35,7 @@ Vue
 Flask
   -server.py for route definition and serverside logic
   -database.py for sqlite3 database querying
+  -util.py for helper methods
 
 If needed:
   -Vue CLI:
